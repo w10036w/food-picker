@@ -1,26 +1,59 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { createContext, useEffect, useState } from "react";
+import styles from './App.module.scss';
+import logo from './svgs/logo.svg';
+import { MyContextType } from "./types";
+import { useMyContext } from "./hooks/useContext";
+import Auth from "./containers/Auth";
+import { useGetInitial } from "./hooks/useGetToken";
+import dayjs from "dayjs";
+import { setToStorage } from "./utils";
+import { useChromeStorage } from "./hooks/useChromeStorage";
+import Home from "./containers/Home";
 
-function App() {
+// Create the context
+export const MyContext = createContext<MyContextType | null>(null);
+
+// Create a provider component
+export const MyContextProvider = ({ children }: any) => {
+  const [date, setDate] = useState(dayjs());
+  const [storage, setStorage] = useState<any>({});
+  const [vendorCode, setVendorCode] = useState('');
+  
+  const updateStorage = (key: string, value: any) => {
+    setStorage((prev: any) => ({ ...prev, [key]: value }))
+    setToStorage(key, value);
+  }
+  
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <MyContext.Provider value={{ date, setDate, storage, updateStorage, vendorCode, setVendorCode }}>
+      {children}
+    </MyContext.Provider>
+  );
+};
+
+
+const App = () => {
+  const { storage } = useMyContext();
+  const { token, host } = storage;
+  useChromeStorage();
+  useGetInitial()
+  return (
+    <div className={styles.app}>
+      <div className={styles.title}>
+        <img src={logo} />
+        Food Picker - Fuan tuan
+      </div>
+      {token && host?.code ? <Home /> : <Auth />}
     </div>
   );
 }
 
-export default App;
+const WrapApp = () => {
+  return (
+    <MyContextProvider>
+      <App />
+    </MyContextProvider>
+  )
+}
+
+export default WrapApp;

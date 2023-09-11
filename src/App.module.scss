@@ -1,0 +1,22 @@
+.app {
+  padding: 20px;
+  .title {
+    text-align: left;
+    padding-bottom: 8px;
+    border-bottom: #000 solid 1px;
+    display: flex;
+    align-items: baseline;
+    font-size: 18px;
+    margin-bottom: 12px;
+    img {
+      width: 14px;
+      margin-right: 8px;
+    }
+    .clear {
+      font-size: 12px;
+      margin-left: auto;
+      color: #19376D;
+      cursor: pointer;
+    }
+  }
+}

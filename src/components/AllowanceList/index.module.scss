@@ -1,0 +1,14 @@
+.wrapper {
+  position: relative;
+  .footer {
+    position: absolute;
+    bottom: 18px;
+    font-weight: bolder;
+    display: flex;
+    align-items: center;
+    .search {
+      width: 250px;
+      margin-left: 10px;
+    }
+  }
+}
