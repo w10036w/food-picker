@@ -1,9 +1,14 @@
 {
   "name": "Foot picker",
-  "description": "Help you check peoples allowances, and create group order quickly",
+  "description": "Help you check peoples allowances, and create group order quickly. Powered by @yukun.yang",
   "version": "1.0",
   "manifest_version": 3,
   "action": {
+    "default_icon": {
+      "16": "toolbar.png",
+      "24": "toolbar.png",
+      "32": "toolbar.png"
+    },
     "default_popup": "index.html",
     "default_title": "Food picker"
   },
