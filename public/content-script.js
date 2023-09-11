@@ -8,7 +8,6 @@ function injectScript(file, node) {
 injectScript(chrome.runtime.getURL("inject-script.js"), "body");
 
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
-  console.log(request)
   if (request.type === "GROUP_ID") {
     localStorage.setItem('groupOrderOtp', JSON.stringify({
       groupOrderId: request.groupOrderId,

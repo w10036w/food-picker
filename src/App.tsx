@@ -1,4 +1,4 @@
-import React, { createContext, useEffect, useState } from "react";
+import React, { createContext, useState } from "react";
 import styles from './App.module.scss';
 import logo from './svgs/logo.svg';
 import { MyContextType } from "./types";
@@ -15,7 +15,12 @@ export const MyContext = createContext<MyContextType | null>(null);
 
 // Create a provider component
 export const MyContextProvider = ({ children }: any) => {
-  const [date, setDate] = useState(dayjs());
+  const year = new Date().getFullYear();
+  const month = new Date().getMonth();
+  const day = new Date().getDate();
+  const hour = new Date().getHours();
+  const formatHour = hour < 10 ? 10 : hour <= 15 ? hour : 19;
+  const [date, setDate] = useState(dayjs(new Date(year, month, day, formatHour)));
   const [storage, setStorage] = useState<any>({});
   const [vendorCode, setVendorCode] = useState('');
   

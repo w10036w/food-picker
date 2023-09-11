@@ -59,7 +59,6 @@ export const useGetAllowanceList = (idList: string[]) => {
   const { token } = storage;
   useEffect(() => {
     if (!token) return
-    if (!idList.length) return
     const headers = getRequestHeaders(token)
     axios.get<{ data: AllowanceRes[] }>(ALLOWANCE, {
       params: {
@@ -93,9 +92,9 @@ export const useInitialGroup = (participantMap: { name: string, customer_code: s
         name: vendorName,
         code: vendorCode
       },
-      expedition_type: "delivery",
       fulfilment_time: new Date(date.format()).toISOString(),
-      fulfilment_time_text: "Delivery ASAP",
+      fulfilment_time_text: `Delivery ${date.format('ddd DD, HH:mm')}`,
+      expedition_type: "delivery",
       fulfilment_address: "Marina Boulevard, MBFC 3, #13-01 Singapore 018982",
       additional_parameters: {
         address: {

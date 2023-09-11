@@ -25,7 +25,7 @@ const AllowanceList = ({ keyId }: Props) => {
     return list?.groups
       .find((item: any) => item.key === keyId)
       ?.list?.filter((item: any) => item) || [];
-  }, [list]);
+  }, [list?.groups]);
 
   const participants = useGetParticipants(userList) ?? new Map();
 
@@ -124,6 +124,7 @@ const AllowanceList = ({ keyId }: Props) => {
         size="small"
         columns={columns}
         dataSource={[...dataSource]}
+        pagination={{ pageSize: 10 }}
         scroll={{ y: 300 }}
       />
       <div className={styles.footer}>
@@ -131,7 +132,7 @@ const AllowanceList = ({ keyId }: Props) => {
         {allowanceList?.reduce((prev, curr) => prev + curr.allowance, 0)}
         <Input.Search
           className={styles.search}
-          placeholder="add participant"
+          placeholder="Add people, type full email"
           allowClear
           onSearch={onSearch}
         />

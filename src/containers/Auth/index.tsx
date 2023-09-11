@@ -1,8 +1,7 @@
-import React, { KeyboardEventHandler, useEffect, useState } from 'react'
+import React, { KeyboardEventHandler } from 'react'
 import styles from './index.module.scss';
-import KeyInput from '../../components/KeyInput';
 import { useMyContext } from '../../hooks/useContext';
-import { Button, Input } from 'antd';
+import { Button } from 'antd';
 
 const Auth = () => {
   const { updateStorage } = useMyContext();
