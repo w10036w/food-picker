@@ -46,7 +46,7 @@ const App = () => {
     <div className={styles.app}>
       <div className={styles.title}>
         <img src={logo} />
-        Food Picker - Fuan tuan
+        Food Picker - Fuan Tuan
       </div>
       {token && host?.code ? <Home /> : <Auth />}
     </div>

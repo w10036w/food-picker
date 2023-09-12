@@ -1,15 +1,17 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   useGetAllowanceList,
   useGetParticipants,
   useInitialGroup,
+  useSearchColleagues,
 } from "../../hooks/useRequest";
-import { Button, Input } from "antd";
+import { Button, Input, Select } from "antd";
 import styles from "./index.module.scss";
 import { useMyContext } from "../../hooks/useContext";
 import DateSelect from "../Action";
 import Table, { ColumnsType } from "antd/es/table";
 import { YOU } from "../../constants";
+import { debounce } from "../../utils";
 
 interface Props {
   keyId: string;
@@ -18,13 +20,18 @@ interface Props {
 const AllowanceList = ({ keyId }: Props) => {
   const { storage, updateStorage } = useMyContext();
   const { list } = storage;
+  const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [selectedRows, setSelectedRows] = useState<
     { name: string; customer_code: string }[]
   >([]);
+  const [search, setSearch] = useState<string>();
+  const [colleague, setColleague] = useState<string>("");
   const userList = useMemo(() => {
-    return list?.groups
-      .find((item: any) => item.key === keyId)
-      ?.list?.filter((item: any) => item) || [];
+    return (
+      list?.groups
+        .find((item: any) => item.key === keyId)
+        ?.list?.filter((item: any) => item) || []
+    );
   }, [list?.groups]);
 
   const participants = useGetParticipants(userList) ?? new Map();
@@ -33,9 +40,9 @@ const AllowanceList = ({ keyId }: Props) => {
     return Array.from(participants.keys());
   }, [participants]);
 
-  const allowanceList = useGetAllowanceList(idList);
+  const [allowanceList, loading] = useGetAllowanceList(idList);
 
-  const onSearch = (value: string) => {
+  const onSearchAdd = (value: string) => {
     if (!value) return;
     const groups = list?.groups.map((item: any) => {
       if (item?.key === keyId) {
@@ -50,6 +57,8 @@ const AllowanceList = ({ keyId }: Props) => {
       ...list,
       groups,
     });
+    setSearch("");
+    setColleague("");
   };
 
   const onDelete = (key: string) => {
@@ -66,17 +75,26 @@ const AllowanceList = ({ keyId }: Props) => {
       ...list,
       groups,
     });
-  }
+  };
 
-  const dataSource = allowanceList?.map((item) => ({
-    name: participants.get(item.customer_code)?.name ?? "You",
-    key: participants.get(item.customer_code)?.key,
-    ...item,
-  })) ?? [];
+  const onSelectSearch = (value: string) => {
+    setSearch(value);
+  };
+
+  const debounceSearch = debounce(onSelectSearch, 500);
+
+  const dataSource =
+    allowanceList?.map((item) => ({
+      name: participants.get(item.customer_code)?.name ?? "You",
+      key: participants.get(item.customer_code)?.key, // for delete
+      ...item,
+    })) ?? [];
 
   const rowSelection = {
+    selectedRowKeys,
     onChange: (selectedRowKeys: React.Key[], selectedRows: any[]) => {
       setSelectedRows(selectedRows);
+      setSelectedRowKeys(selectedRowKeys);
       console.log(
         `selectedRowKeys: ${selectedRowKeys}`,
         "selectedRows: ",
@@ -85,7 +103,9 @@ const AllowanceList = ({ keyId }: Props) => {
     },
   };
 
-  const request = useInitialGroup(selectedRows.filter(item => item.name !== YOU));
+  const request = useInitialGroup(
+    selectedRows.filter((item) => item.name !== YOU)
+  );
 
   const columns: ColumnsType<any> = [
     {
@@ -106,13 +126,30 @@ const AllowanceList = ({ keyId }: Props) => {
       dataIndex: "operation",
       render: (_: any, record: any) => (
         <div>
-          <Button disabled={record.name === YOU} type="link" onClick={() => onDelete(record.key)}>
+          <Button
+            disabled={record.name === YOU}
+            type="link"
+            onClick={() => onDelete(record.key)}
+          >
             Delete
           </Button>
         </div>
       ),
     },
   ];
+
+  const colleaguesList = useSearchColleagues(search);
+
+  const options = colleaguesList
+    ?.filter((o) => !Array.from(participants.keys()).includes(o.customer_code))
+    .map((item) => ({
+      value: item.email,
+      label: `${item.first_name} ${item.last_name}`,
+    }));
+
+  useEffect(() => {
+    setSelectedRowKeys(allowanceList.map((item) => item.customer_code));
+  }, [allowanceList]);
 
   return (
     <div className={styles.wrapper}>
@@ -125,16 +162,23 @@ const AllowanceList = ({ keyId }: Props) => {
         columns={columns}
         dataSource={[...dataSource]}
         pagination={{ pageSize: 10 }}
-        scroll={{ y: 300 }}
+        scroll={{ y: 250 }}
+        loading={loading}
       />
       <div className={styles.footer}>
-        Total Allowance{" "}
-        {allowanceList?.reduce((prev, curr) => prev + curr.allowance, 0)}
-        <Input.Search
+        Total{" "}
+        {allowanceList
+          ?.filter((item) => selectedRowKeys.includes(item.customer_code))
+          ?.reduce((prev, curr) => prev + curr.allowance, 0)
+          ?.toFixed(2)}
+        <Select
+          showSearch
           className={styles.search}
+          value={colleague}
+          onSearch={debounceSearch}
           placeholder="Add people, type full email"
-          allowClear
-          onSearch={onSearch}
+          onChange={onSearchAdd}
+          options={options}
         />
       </div>
     </div>

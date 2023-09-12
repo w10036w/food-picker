@@ -1,6 +1,6 @@
 {
-  "name": "Foot picker",
-  "description": "Help you check peoples allowances, and create group order quickly. Powered by @yukun.yang",
+  "name": "Food picker",
+  "description": "Help you check peoples allowances, and create group order quickly. Powered by @yukun.yang@fe_p2p@fuantuan",
   "version": "1.0",
   "manifest_version": 3,
   "action": {
@@ -13,7 +13,6 @@
     "default_title": "Food picker"
   },
   "host_permissions": [
-    "<all_urls>",
     "http://localhost/*/",
     "https://www.foodpanda.sg/"
   ],

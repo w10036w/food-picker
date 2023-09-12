@@ -1,7 +1,7 @@
 import axios from "axios";
 import { ADD_PARTICIPANTS, ALLOWANCE, GET_COLLEAGUES, GROUP_INITIATE, VENDOR } from "../constants/url";
 import { useEffect, useState } from "react";
-import { AllowanceRes } from "../types";
+import { AllowanceRes, ColleaguesRes } from "../types";
 import { useMyContext } from "./useContext";
 
 const getRequestHeaders = (token: string) => {
@@ -53,12 +53,14 @@ export const useGetParticipants = (list: string[]) => {
   return participantMap;
 }
 
-export const useGetAllowanceList = (idList: string[]) => {
+export const useGetAllowanceList = (idList: string[]): [AllowanceRes[], boolean] => {
   const [list, setList] = useState<AllowanceRes[]>([])
+  const [loading, setLoading] = useState(false);
   const { date, storage } = useMyContext()
   const { token } = storage;
   useEffect(() => {
     if (!token) return
+    setLoading(true)
     const headers = getRequestHeaders(token)
     axios.get<{ data: AllowanceRes[] }>(ALLOWANCE, {
       params: {
@@ -70,11 +72,12 @@ export const useGetAllowanceList = (idList: string[]) => {
       },
       headers
     }).then(({ data }) => {
+      setLoading(false)
       setList(data?.data);
     })
   }, [idList])
 
-  return list;
+  return [list, loading];
 }
 
 export const useInitialGroup = (participantMap: { name: string, customer_code: string }[]) => {
@@ -170,4 +173,22 @@ export const useInitialGroup = (participantMap: { name: string, customer_code: s
     chrome.tabs.reload(id);
   }
   return request
+}
+
+export const useSearchColleagues = (query?: string) => {
+  // this is to format stored data
+  const [list, setList] = useState<ColleaguesRes[]>([])
+  const { date, storage } = useMyContext()
+  const { token } = storage;
+  useEffect(() => {
+    if (!token || !query) {
+      setList([])
+      return
+    }
+    getParticipant(query, new Date(date.format()).toISOString(), token).then((data) => {
+      setList(data);
+    })
+  }, [query])
+
+  return list;
 }

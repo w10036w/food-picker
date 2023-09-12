@@ -27,3 +27,11 @@ export interface AllowanceRes {
   is_required_expense_code: boolean;
   is_allowance_available: boolean;
 }
+
+export interface ColleaguesRes {
+  email: string;
+  first_name: string;
+  last_name: string;
+  customer_code: string;
+  allowance: number;
+}
