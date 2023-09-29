@@ -25,7 +25,7 @@ const AllowanceList = ({ keyId }: Props) => {
     { name: string; customer_code: string }[]
   >([]);
   const [search, setSearch] = useState<string>();
-  const [colleague, setColleague] = useState<string>("");
+  const [colleague, setColleague] = useState<string>();
   const userList = useMemo(() => {
     return (
       list?.groups
@@ -83,12 +83,13 @@ const AllowanceList = ({ keyId }: Props) => {
 
   const debounceSearch = debounce(onSelectSearch, 500);
 
-  const dataSource =
-    allowanceList?.map((item) => ({
+  const dataSource = useMemo(() => {    
+    return allowanceList?.map((item) => ({
       name: participants.get(item.customer_code)?.name ?? "You",
       key: participants.get(item.customer_code)?.key, // for delete
       ...item,
     })) ?? [];
+  }, [allowanceList])
 
   const rowSelection = {
     selectedRowKeys,
@@ -149,6 +150,7 @@ const AllowanceList = ({ keyId }: Props) => {
 
   useEffect(() => {
     setSelectedRowKeys(allowanceList.map((item) => item.customer_code));
+    setSelectedRows(dataSource)
   }, [allowanceList]);
 
   return (
@@ -176,7 +178,7 @@ const AllowanceList = ({ keyId }: Props) => {
           className={styles.search}
           value={colleague}
           onSearch={debounceSearch}
-          placeholder="Add people, type full email"
+          placeholder="Type to search people"
           onChange={onSearchAdd}
           options={options}
         />
